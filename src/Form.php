@@ -60,6 +60,25 @@ class Form extends UIForm
 		return parent::setDefaults($this->defaults = $data, $erase);
 	}
 
+	public function hasDefaults(): bool
+	{
+		return $this->defaults !== null;
+	}
+
+	public function getDefaults(): object|array|null
+	{
+		return $this->defaults;
+	}
+
+	public function getArrayDefaults(): array
+	{
+		if (is_object($this->defaults)) {
+			return $this->getMapper()->mapToArray($this, $this->defaults);
+		}
+
+		return (array) $this->defaults;
+	}
+
 	/**
 	 * @inheritDoc
 	 */

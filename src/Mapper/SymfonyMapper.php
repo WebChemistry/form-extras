@@ -16,6 +16,9 @@ class SymfonyMapper implements MapperInterface
 	public const IGNORE_CONTROL = 'serializer:ignoreControl';
 
 	/** @var callable[] */
+	public array $onValues = [];
+
+	/** @var callable[] */
 	public array $onBeforeDenormalization = [];
 
 	/** @var callable[] */
@@ -36,6 +39,8 @@ class SymfonyMapper implements MapperInterface
 	/** @var array<int|string, string|array> */
 	private array $exportedAttributes = [];
 
+	private object $object;
+
 	public function __construct(
 		private Serializer $serializer,
 	)
@@ -55,9 +60,43 @@ class SymfonyMapper implements MapperInterface
 	/**
 	 * @param mixed[] $normalizationContext
 	 */
+	public function addToNormalizationContext(array $normalizationContext): static
+	{
+		$this->normalizationContext = array_merge($this->normalizationContext, $normalizationContext);
+
+		return $this;
+	}
+
+	public function addSingleToNormalizationContext(string $key, mixed $value): static
+	{
+		$this->onBeforeDenormalization[$key] = $value;
+
+		return $this;
+	}
+
+	/**
+	 * @param mixed[] $normalizationContext
+	 */
 	public function setNormalizationContext(array $normalizationContext): static
 	{
 		$this->normalizationContext = $normalizationContext;
+
+		return $this;
+	}
+
+	/**
+	 * @param mixed[] $denormalizationContext
+	 */
+	public function addToDenormalizationContext(array $denormalizationContext): static
+	{
+		$this->denormalizationContext = array_merge($this->denormalizationContext, $denormalizationContext);
+
+		return $this;
+	}
+
+	public function addSingleToDenormalizationContext(string $key, mixed $value): static
+	{
+		$this->denormalizationContext[$key] = $value;
 
 		return $this;
 	}
@@ -74,20 +113,28 @@ class SymfonyMapper implements MapperInterface
 
 	public function mapToObject(Form $form, string $className, array $values, ?object $object): object
 	{
-		$context = $this->denormalizationContext;
-		if ($object) {
-			$context = [
-				AbstractNormalizer::OBJECT_TO_POPULATE => $object,
-			];
+		if (!isset($this->object)) {
+			$context = $this->denormalizationContext;
+			if ($object) {
+				$context = [
+					AbstractNormalizer::OBJECT_TO_POPULATE => $object,
+				];
+			}
+
+			foreach ($this->onBeforeDenormalization as $callback) {
+				$return = $callback($values);
+
+				if (is_array($return)) {
+					$values = $return;
+				}
+			}
+
+			$this->object = $this->serializer->denormalize($values, $className, context: $context);
+
+			Arrays::invoke($this->onAfterDenormalization);
 		}
 
-		Arrays::invoke($this->onBeforeDenormalization);
-
-		$object = $this->serializer->denormalize($values, $className, context: $context);
-
-		Arrays::invoke($this->onAfterDenormalization);
-
-		return $object;
+		return $this->object;
 	}
 
 	public function mapToArray(Form $form, object $object): array
