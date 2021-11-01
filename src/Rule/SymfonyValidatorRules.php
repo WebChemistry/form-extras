@@ -83,7 +83,8 @@ final class SymfonyValidatorRules implements SymfonyNetteRuleInterface
 					$this->replaceMessageTemplate(
 						$constraint->minMessage,
 						['{{ limit }}' => $constraint->min]
-					)
+					),
+					$constraint->min,
 				);
 			}
 
@@ -93,7 +94,8 @@ final class SymfonyValidatorRules implements SymfonyNetteRuleInterface
 					$this->replaceMessageTemplate(
 						$constraint->maxMessage,
 						['{{ limit }}' => $constraint->max]
-					)
+					),
+					$constraint->max,
 				);
 			}
 
