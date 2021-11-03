@@ -10,25 +10,22 @@ use Nette\Forms\Form;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class RuleApplier implements RuleApplierInterface
+class SymfonyValidatorFormRuleApplier implements FormRuleApplierInterface
 {
 
 	public const SKIP_FIELDS = 'skipFields';
 	public const CUSTOM_FIELD_MAPPING = 'customMapping';
 
 	/**
-	 * @param SymfonyNetteRuleInterface[] $rules
+	 * @param SymfonyConstraintsToFormRulesInterface[] $rules
 	 */
 	public function __construct(
 		private array $rules,
-		private ValidatorInterface $validator
+		private ValidatorInterface $validator,
 	)
 	{
 	}
 
-	/**
-	 * @param mixed[] $context
-	 */
 	public function apply(string $className, Form $form, array $context = []): void
 	{
 		$this->applyToContainer(

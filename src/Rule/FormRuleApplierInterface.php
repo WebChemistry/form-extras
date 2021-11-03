@@ -4,7 +4,7 @@ namespace WebChemistry\FormExtras\Rule;
 
 use Nette\Forms\Form;
 
-interface RuleApplierInterface
+interface FormRuleApplierInterface
 {
 
 	/**

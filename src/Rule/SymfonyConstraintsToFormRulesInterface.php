@@ -5,7 +5,7 @@ namespace WebChemistry\FormExtras\Rule;
 use Nette\Forms\Controls\BaseControl;
 use Symfony\Component\Validator\Constraint;
 
-interface SymfonyNetteRuleInterface
+interface SymfonyConstraintsToFormRulesInterface
 {
 
 	public function supports(BaseControl $control, Constraint $constraint, array $context = []): bool;

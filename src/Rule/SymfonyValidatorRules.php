@@ -25,7 +25,7 @@ use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\Url;
 
-final class SymfonyValidatorRules implements SymfonyNetteRuleInterface
+final class SymfonyValidatorRules implements SymfonyConstraintsToFormRulesInterface
 {
 
 	public function supports(BaseControl $control, Constraint $constraint, array $context = []): bool
@@ -112,7 +112,7 @@ final class SymfonyValidatorRules implements SymfonyNetteRuleInterface
 				return;
 			}
 
-			$control->addRule(Form::PATTERN, $this->replaceMessageTemplate($constraint->message));
+			$control->addRule(Form::PATTERN, $this->replaceMessageTemplate($constraint->message), $regex);
 		} else if ($constraint instanceof EqualTo) {
 			$control->addRule(Form::EQUAL, $this->replaceMessageTemplate($constraint->message, [
 				'{{ compared_value }}' => $constraint->value,
