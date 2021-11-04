@@ -7,6 +7,7 @@ use Nette\Forms\Controls\BaseControl;
 use Nette\Forms\Controls\Button;
 use Nette\Forms\Form;
 use Nette\Utils\Arrays;
+use Nette\Utils\Callback;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
@@ -69,7 +70,7 @@ class SymfonyMapper implements MapperInterface
 
 	public function addSingleToNormalizationContext(string $key, mixed $value): static
 	{
-		$this->onBeforeDenormalization[$key] = $value;
+		$this->normalizationContext[$key] = $value;
 
 		return $this;
 	}
@@ -122,6 +123,7 @@ class SymfonyMapper implements MapperInterface
 			}
 
 			foreach ($this->onBeforeDenormalization as $callback) {
+				Callback::check($callback);
 				$return = $callback($values);
 
 				if (is_array($return)) {
