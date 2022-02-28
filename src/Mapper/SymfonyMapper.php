@@ -117,9 +117,7 @@ class SymfonyMapper implements MapperInterface
 		if (!isset($this->object)) {
 			$context = $this->denormalizationContext;
 			if ($object) {
-				$context = [
-					AbstractNormalizer::OBJECT_TO_POPULATE => $object,
-				];
+				$context[AbstractNormalizer::OBJECT_TO_POPULATE] = $object;
 			}
 
 			foreach ($this->onBeforeDenormalization as $callback) {
