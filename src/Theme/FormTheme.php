@@ -14,7 +14,7 @@ interface FormTheme
 	public const FormErrorsItem = 'rendering:errors:item';
 	public const Pair = 'rendering:pair';
 	public const Label = 'rendering:label';
-	public const Control = 'renderin:control';
+	public const Control = 'rendering:control';
 	public const ControlContainer = 'rendering:container';
 	public const ControlSeparator = 'rendering:separator';
 
