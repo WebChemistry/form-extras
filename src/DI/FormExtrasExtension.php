@@ -2,7 +2,6 @@
 
 namespace WebChemistry\FormExtras\DI;
 
-use App\Validator\SymfonyRulesToNetteRules;
 use Nette\DI\CompilerExtension;
 use Nette\DI\Definitions\ServiceDefinition;
 use Nette\Schema\Expect;

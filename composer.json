@@ -8,5 +8,10 @@
 		"psr-4": {
 			"WebChemistry\\FormExtras\\": "src"
 		}
+	},
+	"require-dev": {
+		"symfony/validator": "^6.1",
+		"symfony/serializer": "^6.1",
+		"nette/di": "^3.0"
 	}
 }
