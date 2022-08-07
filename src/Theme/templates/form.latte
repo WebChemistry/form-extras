@@ -1,0 +1,89 @@
+{varType WebChemistry\FormExtras\Form $form}
+
+{do $form->getTheme()->enterForm($form)}
+
+<form n:name="$form" n:block="form" n:inner-block="form:inner">
+
+	{* Form errors *}
+    {block form:errors}
+        {var WebChemistry\FormExtras\Theme\Html\HtmlElement $element = $form->getTheme()->getFormErrorsElement($form)}
+        {var WebChemistry\FormExtras\Theme\Html\HtmlElement $elementItem = $form->getTheme()->getFormErrorsItemElement($form)}
+
+        {var array $errors = $form->getTheme()->getFormErrors($form)}
+
+        <ul
+            n:tag="$element->getName()"
+            n:attr="$element->getAttributesAsArray()"
+            n:if="$errors"
+        >
+            <li
+                n:tag="$elementItem->getName()"
+                n:attr="$elementItem->getAttributesAsArray()"
+                n:block="form:errors:item"
+                n:inner-block="form:errors:item:inner"
+                n:foreach="$errors as $error">{(string) $error}</li>
+        </ul>
+    {/block}
+
+	{include block controls controls: $form->getControls()}
+
+</form>
+
+{define pair}
+	{varType Nette\Forms\Controls\BaseControl $control}
+
+	{var App\UI\Form\Factory\Template\HtmlElement $element = $form->getTheme()->getPairElement($control)}
+
+	<div
+		n:tag-if="$element->getName() !== ''"
+		n:tag="$element->getName()"
+		n:inner-block="pair:inner"
+		n:attr="$element->getAttributesAsArray()"
+	>
+		{do $form->getTheme()->enterControl($control)}
+
+		{block label}
+			{$control->getLabel()}
+		{/block}
+
+		{block control}
+			{do $control->setOption('rendered', true)}
+
+			{$control->getControl()}
+
+				{var App\UI\Form\Factory\Template\HtmlElement $element = $form->getTheme()->getDescriptionElement($control)}
+
+				<div
+					n:block="control:description"
+					n:if="$description = $control->getOption('description')"
+					n:tag="$element->getName()"
+					n:attr="$element->getAttributesAsArray()"
+				>
+					{$description}
+				</div>
+
+				{block control:errors}
+					{var App\UI\Form\Factory\Template\HtmlElement $element = $form->getTheme()->getErrorElement($control)}
+
+					<div
+						n:foreach="$control->getErrors() as $error"
+						n:tag="$element->getName()"
+						n:attr="$element->getAttributesAsArray()"
+					>
+						{block control:errors:item}{$error}{/block}
+					</div>
+				{/block}
+		{/block}
+	</div>
+{/define}
+
+{define controls}
+	{varType Nette\Forms\Controls\BaseControl[] $controls}
+
+	{foreach $controls as $control}
+		{continueIf $control instanceof Nette\Forms\Controls\HiddenField}
+		{continueIf $control->getOption('rendered')}
+
+		{include block pair control: $control}
+	{/foreach}
+{/define}

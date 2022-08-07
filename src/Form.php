@@ -2,16 +2,20 @@
 
 namespace WebChemistry\FormExtras;
 
-use Nette\Application\UI\Form as UIForm;
+use DomainException;
+use Nette\Application\UI\Form as NetteUIForm;
+use Nette\Localization\Translator;
+use WebChemistry\FormExtras\Extension\FormWithOptions;
 use WebChemistry\FormExtras\Mapper\MapperInterface;
 use WebChemistry\FormExtras\Mapper\SimpleMapper;
+use WebChemistry\FormExtras\Theme\FormTheme;
 use WebChemistry\FormExtras\Validator\ValidatorInterface;
 use WebChemistry\FormExtras\Validator\VoidValidator;
 
-class Form extends UIForm
+class Form extends NetteUIForm implements FormWithOptions
 {
 
-	private ?string $mappedType = null;
+	private FormTheme $theme;
 
 	private MapperInterface $mapper;
 
@@ -24,14 +28,55 @@ class Form extends UIForm
 	/** @var mixed[] */
 	private array $fixedValues = [];
 
+	/** @var mixed[] */
+	private array $options = [];
+
+	public function __construct(
+		private string $mappedType = 'array',
+		?ValidatorInterface $validator = null,
+		?MapperInterface $mapper = null,
+		?Translator $translator = null,
+		?FormTheme $theme = null,
+	)
+	{
+		parent::__construct();
+
+		$this->validator = $validator ?? VoidValidator::getInstance();
+		$this->mapper = $mapper ?? SimpleMapper::getInstance();
+
+		if ($theme) {
+			$this->theme = $theme;
+			$this->setRenderer($theme->createRenderer());
+		}
+
+		$this->setTranslator($translator);
+	}
+
+	public function hasTheme(): bool
+	{
+		return isset($this->theme);
+	}
+
+	public function getTheme(): FormTheme
+	{
+		return $this->theme ?? throw new DomainException(sprintf('Theme is not set for "%s" form.', $this->getName()));
+	}
+
+	public function setTheme(?FormTheme $theme): static
+	{
+		$this->theme = $theme;
+
+		return $this;
+	}
+
 	public function getValidator(): ValidatorInterface
 	{
-		return $this->validator ??= VoidValidator::getInstance();
+		return $this->validator;
 	}
 
 	public function getMapper(): MapperInterface
 	{
-		return $this->mapper ??= SimpleMapper::getInstance();
+		return $this->mapper;
 	}
 
 	public function addFixedValue(string $name, mixed $value): static
@@ -73,7 +118,7 @@ class Form extends UIForm
 	public function getArrayDefaults(): array
 	{
 		if (is_object($this->defaults)) {
-			return $this->getMapper()->mapToArray($this, $this->defaults);
+			return $this->mapper->mapToArray($this, $this->defaults);
 		}
 
 		return (array) $this->defaults;
@@ -85,7 +130,7 @@ class Form extends UIForm
 	public function setValues($data, bool $erase = false)
 	{
 		return parent::setValues(
-			is_object($data) ? $this->getMapper()->mapToArray($this, $data) : $data,
+			is_object($data) ? $this->mapper->mapToArray($this, $data) : $data,
 			$erase
 		);
 	}
@@ -96,7 +141,7 @@ class Form extends UIForm
 	public function getUnsafeValues($returnType = null, array $controls = null)
 	{
 		$array = parent::getUnsafeValues('array', $controls);
-		$type = $returnType ?? $this->mappedType ?? null;
+		$type = $returnType ?? $this->mappedType;
 
 		$array = array_merge($this->fixedValues, $array);
 
@@ -104,7 +149,7 @@ class Form extends UIForm
 			return $array;
 		}
 
-		return $this->getMapper()->mapToObject($this, $type, $array, is_object($this->defaults) ? $this->defaults : null);
+		return $this->mapper->mapToObject($this, $type, $array, is_object($this->defaults) ? $this->defaults : null);
 	}
 
 	public function validate(array $controls = null): void
@@ -113,11 +158,23 @@ class Form extends UIForm
 			$this->validatorRegistered = true;
 
 			$this->onValidate[] = function (): void {
-				$this->getValidator()->validate($this, $this->getUnsafeValues());
+				$this->validator->validate($this, $this->getUnsafeValues());
 			};
 		}
 
 		parent::validate($controls);
+	}
+
+	public function setOption(string $name, mixed $value): static
+	{
+		$this->options[$name] = $value;
+
+		return $this;
+	}
+
+	public function getOption(string $name, mixed $default = null): mixed
+	{
+		return $this->options[$name] ?? $default;
 	}
 
 }

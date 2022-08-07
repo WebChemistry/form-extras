@@ -2,17 +2,23 @@
 
 namespace WebChemistry\FormExtras\DI;
 
+use DomainException;
 use Nette\DI\CompilerExtension;
+use Nette\DI\Definitions\FactoryDefinition;
 use Nette\DI\Definitions\ServiceDefinition;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
 use stdClass;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use WebChemistry\FormExtras\Factory\FormFactory;
+use WebChemistry\FormExtras\Renderer\LatteFormRendererFactory;
+use WebChemistry\FormExtras\Renderer\ThemeFormRendererFactory;
 use WebChemistry\FormExtras\Rule\CompositeFormRuleApplier;
 use WebChemistry\FormExtras\Rule\FormRuleApplierInterface;
 use WebChemistry\FormExtras\Rule\SymfonyConstraintsToFormRulesInterface;
 use WebChemistry\FormExtras\Rule\SymfonyValidatorFormRuleApplier;
 use WebChemistry\FormExtras\Rule\SymfonyValidatorRules;
+use WebChemistry\FormExtras\Theme\FormTheme;
 
 final class FormExtrasExtension extends CompilerExtension
 {
@@ -21,12 +27,15 @@ final class FormExtrasExtension extends CompilerExtension
 
 	private ServiceDefinition $symfonyConstraintsToFormRules;
 
+	private ServiceDefinition $latteFormRendererFactory;
+
 	public function getConfigSchema(): Schema
 	{
 		return Expect::structure([
 			'rules' => Expect::structure([
 				'enable' => Expect::bool(true),
 			]),
+			'template' => Expect::string(),
 		]);
 	}
 
@@ -55,11 +64,43 @@ final class FormExtrasExtension extends CompilerExtension
 					->setFactory(SymfonyValidatorRules::class);
 			}
 		}
+
+		$builder->addFactoryDefinition($this->prefix('factory'))
+			->setImplement(FormFactory::class);
+
+		$builder->addDefinition($this->prefix('latte.themeFactory'))
+			->setFactory(ThemeFormRendererFactory::class);
+
+		$builder->addDefinition(
+			$this->prefix('latte.rendererFactory'),
+			$this->latteFormRendererFactory = new ServiceDefinition(),
+		)
+			->setFactory(LatteFormRendererFactory::class);
 	}
 
 	public function beforeCompile(): void
 	{
+		/** @var stdClass $config */
+		$config = $this->getConfig();
 		$builder = $this->getContainerBuilder();
+
+		if ($config->template) {
+			if ($builder->findByType(FormTheme::class)) {
+				throw new DomainException('Combination of theme and template is not recommended.');
+			}
+
+			foreach ($builder->findByType(FormFactory::class) as $service) {
+				if (!$service instanceof FactoryDefinition) {
+					continue;
+				}
+
+				$service->getResultDefinition()
+					->addSetup(
+						'?->setRenderer(?->create(?))',
+						['@self', $this->latteFormRendererFactory, $config->template],
+					);
+			}
+		}
 
 		if (isset($this->ruleApplier)) {
 			$appliers = [];

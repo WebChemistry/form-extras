@@ -12,6 +12,9 @@
 	"require-dev": {
 		"symfony/validator": "^6.1",
 		"symfony/serializer": "^6.1",
-		"nette/di": "^3.0"
+		"nette/di": "^3.0",
+		"nette/application": "^3.1",
+		"latte/latte": "^3.0",
+		"symfony/property-access": "^6.1"
 	}
 }
