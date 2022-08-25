@@ -25,10 +25,10 @@ class SymfonyMapper implements MapperInterface
 	/** @var callable[] */
 	public array $onAfterDenormalization = [];
 
-	/** @var callable[] */
+	/** @var array<callable(object=)> */
 	public array $onBeforeNormalization = [];
 
-	/** @var callable[] */
+	/** @var array<callable(mixed[]=)> */
 	public array $onAfterNormalization = [];
 
 	/** @var mixed[] */
@@ -141,7 +141,7 @@ class SymfonyMapper implements MapperInterface
 	{
 		$context = $this->normalizationContext;
 
-		Arrays::invoke($this->onBeforeNormalization);
+		Arrays::invoke($this->onBeforeNormalization, $object);
 
 		if (!isset($context[AbstractNormalizer::ATTRIBUTES]) && !isset($context[AbstractNormalizer::IGNORED_ATTRIBUTES])) {
 			$context[AbstractNormalizer::ATTRIBUTES] = $this->getAttributesForNormalizationContext(
@@ -152,7 +152,7 @@ class SymfonyMapper implements MapperInterface
 
 		$array = $this->serializer->normalize($object, context: $context);
 
-		Arrays::invoke($this->onAfterNormalization);
+		Arrays::invoke($this->onAfterNormalization, $array);
 
 		return $array;
 	}
