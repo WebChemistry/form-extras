@@ -38,7 +38,7 @@ interface FormTheme
 
 	public function getControlElement(BaseControl $control): HtmlElement;
 
-	public function getLabelHtml(BaseControl $control): Html;
+	public function getLabelHtml(BaseControl $control): ?Html;
 
 	public function getDescriptionElement(BaseControl $control): HtmlElement;
 

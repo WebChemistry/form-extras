@@ -245,15 +245,15 @@ class DefaultFormTheme implements FormTheme
 		}
 	}
 
-	public function getLabelHtml(BaseControl $control): Html
+	public function getLabelHtml(BaseControl $control): ?Html
 	{
-		$label = clone $control->getLabelPrototype();
-		$label->for = $control->getHtmlId();
-		$caption = $control->caption;
+		$label = $control->getLabel();
 
-		if (!$caption instanceof HtmlStringable) {
-			$caption = $control->getForm()->getTranslator()->translate($caption);
+		if ($label === null) {
+			return null;
 		}
+
+		$caption = $label->getText();
 
 		if ($control->isRequired() && $this->asteriskInCaption && is_string($control->caption)) {
 			$caption .= '*';
