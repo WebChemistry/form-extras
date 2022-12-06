@@ -5,6 +5,7 @@ namespace WebChemistry\FormExtras\Theme;
 use Nette\Forms\Controls\BaseControl;
 use Nette\Forms\Form;
 use Nette\Forms\FormRenderer;
+use Nette\Utils\Html;
 use WebChemistry\FormExtras\Theme\Html\HtmlElement;
 
 interface FormTheme
@@ -36,6 +37,8 @@ interface FormTheme
 	public function getLabelElement(BaseControl $control): HtmlElement;
 
 	public function getControlElement(BaseControl $control): HtmlElement;
+
+	public function getLabelHtml(BaseControl $control): Html;
 
 	public function getDescriptionElement(BaseControl $control): HtmlElement;
 

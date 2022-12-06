@@ -7,6 +7,8 @@ use Nette\Forms\Controls\Checkbox;
 use Nette\Forms\Controls\CheckboxList;
 use Nette\Forms\Form;
 use Nette\Forms\FormRenderer;
+use Nette\HtmlStringable;
+use Nette\Utils\Html;
 use WebChemistry\FormExtras\Extension\FormWithOptions;
 use WebChemistry\FormExtras\Renderer\ThemeFormRendererFactory;
 use WebChemistry\FormExtras\Theme\Html\HtmlElement;
@@ -241,10 +243,25 @@ class DefaultFormTheme implements FormTheme
 			$this->getControlAttributesBySection($control, 'container')->applyToHtml($control->getContainerPrototype());
 			$this->getControlAttributesBySection($control, 'separator')->applyToHtml($control->getSeparatorPrototype());
 		}
+	}
+
+	public function getLabelHtml(BaseControl $control): Html
+	{
+		$label = clone $control->getLabelPrototype();
+		$label->for = $control->getHtmlId();
+		$caption = $control->caption;
+
+		if (!$caption instanceof HtmlStringable) {
+			$caption = $control->getForm()->getTranslator()->translate($caption);
+		}
 
 		if ($control->isRequired() && $this->asteriskInCaption && is_string($control->caption)) {
-			$control->caption .= '*';
+			$caption .= '*';
 		}
+
+		$label->setText($caption);
+
+		return $label;
 	}
 
 	/**

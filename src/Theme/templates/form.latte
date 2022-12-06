@@ -43,7 +43,7 @@
 		{do $form->getTheme()->enterControl($control)}
 
 		{block label}
-			{$control->getLabel()}
+			{$form->getTheme()->getLabelHtml($control)}
 		{/block}
 
 		{block control}
