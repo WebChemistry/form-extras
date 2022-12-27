@@ -49,30 +49,32 @@
 		{block control}
 			{do $control->setOption('rendered', true)}
 
-			{$control->getControl()}
+			{block "control-{$control->getName()}:input"}
+				{$control->getControl()}
+			{/block}
 
-				{var App\UI\Form\Factory\Template\HtmlElement $element = $form->getTheme()->getDescriptionElement($control)}
+			{var App\UI\Form\Factory\Template\HtmlElement $element = $form->getTheme()->getDescriptionElement($control)}
+
+			<div
+				n:block="control:description"
+				n:if="$description = $control->getOption('description')"
+				n:tag="$element->getName()"
+				n:attr="$element->getAttributesAsArray()"
+			>
+				{$description}
+			</div>
+
+			{block control:errors}
+				{var App\UI\Form\Factory\Template\HtmlElement $element = $form->getTheme()->getErrorElement($control)}
 
 				<div
-					n:block="control:description"
-					n:if="$description = $control->getOption('description')"
+					n:foreach="$control->getErrors() as $error"
 					n:tag="$element->getName()"
 					n:attr="$element->getAttributesAsArray()"
 				>
-					{$description}
+					{block control:errors:item}{$error}{/block}
 				</div>
-
-				{block control:errors}
-					{var App\UI\Form\Factory\Template\HtmlElement $element = $form->getTheme()->getErrorElement($control)}
-
-					<div
-						n:foreach="$control->getErrors() as $error"
-						n:tag="$element->getName()"
-						n:attr="$element->getAttributesAsArray()"
-					>
-						{block control:errors:item}{$error}{/block}
-					</div>
-				{/block}
+			{/block}
 		{/block}
 	</div>
 {/define}
