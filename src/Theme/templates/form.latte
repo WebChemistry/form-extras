@@ -47,9 +47,11 @@
 		{/block}
 
 		{block control}
+			{var string $name = $control->getName()}
+
 			{do $control->setOption('rendered', true)}
 
-			{block "control-{$control->getName()}:input"}
+			{block "control-$name:input"}
 				{$control->getControl()}
 			{/block}
 
