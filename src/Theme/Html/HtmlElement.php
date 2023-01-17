@@ -140,8 +140,12 @@ final class HtmlElement
 		}
 
 		foreach ($this->attributes->getAttributes() as $name => $strings) {
-			foreach ($strings as $string) {
-				$html->appendAttribute($name, $string);
+			if (str_starts_with($name, 'data-')) {
+				$html->setAttribute($name, implode(' ', $strings));
+			} else {
+				foreach ($strings as $string) {
+					$html->appendAttribute($name, $string);
+				}
 			}
 		}
 	}
