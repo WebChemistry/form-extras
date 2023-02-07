@@ -6,11 +6,13 @@ use DomainException;
 use Nette\Application\UI\Form as NetteUIForm;
 use Nette\Localization\Translator;
 use WebChemistry\FormExtras\Extension\FormWithOptions;
+use WebChemistry\FormExtras\Mapper\MapperFactoryInterface;
 use WebChemistry\FormExtras\Mapper\MapperInterface;
-use WebChemistry\FormExtras\Mapper\SimpleMapper;
+use WebChemistry\FormExtras\Mapper\SimpleMapperFactory;
 use WebChemistry\FormExtras\Theme\FormTheme;
+use WebChemistry\FormExtras\Validator\ValidatorFactoryInterface;
 use WebChemistry\FormExtras\Validator\ValidatorInterface;
-use WebChemistry\FormExtras\Validator\VoidValidator;
+use WebChemistry\FormExtras\Validator\VoidValidatorFactory;
 
 class Form extends NetteUIForm implements FormWithOptions
 {
@@ -33,16 +35,16 @@ class Form extends NetteUIForm implements FormWithOptions
 
 	public function __construct(
 		private string $mappedType = 'array',
-		?ValidatorInterface $validator = null,
-		?MapperInterface $mapper = null,
+		?ValidatorFactoryInterface $validatorFactory = null,
+		?MapperFactoryInterface $mapperFactory = null,
 		?Translator $translator = null,
 		?FormTheme $theme = null,
 	)
 	{
 		parent::__construct();
 
-		$this->validator = $validator ?? VoidValidator::getInstance();
-		$this->mapper = $mapper ?? SimpleMapper::getInstance();
+		$this->validator = ($validatorFactory ?? new VoidValidatorFactory())->create();
+		$this->mapper = ($mapperFactory ?? new SimpleMapperFactory())->create();
 
 		if ($theme) {
 			$this->theme = $theme;
@@ -157,8 +159,8 @@ class Form extends NetteUIForm implements FormWithOptions
 		if (!$this->validatorRegistered) {
 			$this->validatorRegistered = true;
 
-			$this->onValidate[] = function (): void {
-				$this->validator->validate($this, $this->getUnsafeValues());
+			$this->onValidate[] = function (Form $form, array $values): void {
+				$this->validator->validate($form, $values);
 			};
 		}
 

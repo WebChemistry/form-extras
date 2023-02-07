@@ -6,19 +6,16 @@ use Nette\Forms\Form;
 use ReflectionClass;
 use stdClass;
 use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use WebChemistry\FormExtras\Mapper\Exceptions\NoConstructorValueException;
 
 final class SimpleMapper implements MapperInterface
 {
 
-	private static SimpleMapper $instance;
-
-	private PropertyAccessor $propertyAccessor;
+	private PropertyAccessorInterface $propertyAccessor;
 
 	public function __construct(
-		?PropertyAccessor $propertyAccessor = null,
+		?PropertyAccessorInterface $propertyAccessor = null,
 	)
 	{
 		$this->propertyAccessor = $propertyAccessor ?? $this->createPropertyAccessor();
@@ -98,11 +95,6 @@ final class SimpleMapper implements MapperInterface
 	private function createPropertyAccessor(): PropertyAccessorInterface
 	{
 		return PropertyAccess::createPropertyAccessor();
-	}
-
-	public static function getInstance(): self
-	{
-		return self::$instance ??= new self();
 	}
 
 }
