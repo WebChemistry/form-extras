@@ -159,8 +159,8 @@ class Form extends NetteUIForm implements FormWithOptions
 		if (!$this->validatorRegistered) {
 			$this->validatorRegistered = true;
 
-			$this->onValidate[] = function (Form $form, array $values): void {
-				$this->validator->validate($form, $values);
+			$this->onValidate[] = function (Form $form): void {
+				$this->validator->validate($form, $form->getValues());
 			};
 		}
 
