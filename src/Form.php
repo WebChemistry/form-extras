@@ -140,9 +140,22 @@ class Form extends NetteUIForm implements FormWithOptions
 	/**
 	 * @inheritDoc
 	 */
-	public function getUnsafeValues($returnType = null, array $controls = null)
+	public function getUnsafeValues($returnType = null, ?array $controls = null)
 	{
-		$array = parent::getUnsafeValues('array', $controls);
+		return $this->getUntrustedValues($returnType, $controls);
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function getUntrustedValues($returnType = null, ?array $controls = null)
+	{
+		if (method_exists($this, 'getUntrustedValues')) {
+			$array = parent::getUntrustedValues('array', $controls);
+		} else {
+			$array = parent::getUnsafeValues('array', $controls);
+		}
+
 		$type = $returnType ?? $this->mappedType;
 
 		$array = array_merge($this->fixedValues, $array);
