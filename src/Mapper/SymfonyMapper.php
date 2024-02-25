@@ -19,10 +19,10 @@ class SymfonyMapper implements MapperInterface
 	/** @var callable[] */
 	public array $onValues = [];
 
-	/** @var array<callable(mixed[]=): mixed[]> */
+	/** @var array<callable(mixed[]): mixed[]> */
 	public array $toArrayDecorator = [];
 
-	/** @var array<callable(object=): object> */
+	/** @var array<callable(object): object> */
 	public array $toObjectDecorator = [];
 
 	/** @var callable[] */
@@ -31,10 +31,10 @@ class SymfonyMapper implements MapperInterface
 	/** @var callable[] */
 	public array $onAfterDenormalization = [];
 
-	/** @var array<callable(object=): void> */
+	/** @var array<callable(object): void> */
 	public array $onBeforeNormalization = [];
 
-	/** @var array<callable(mixed[]=): void> */
+	/** @var array<callable(mixed[]): void> */
 	public array $onAfterNormalization = [];
 
 	/** @var mixed[] */
