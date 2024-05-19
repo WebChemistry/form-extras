@@ -86,7 +86,7 @@ class DefaultFormTheme implements FormTheme
 		],
 		'.button' => [
 			'attributes' => [
-				'class=' => 'btn btn-primary',
+				'class=' => 'form-control-submit',
 			],
 		],
 		'.checkbox' => [
