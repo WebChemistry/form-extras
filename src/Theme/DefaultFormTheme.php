@@ -247,21 +247,17 @@ class DefaultFormTheme implements FormTheme
 
 	public function getLabelHtml(BaseControl $control): ?Html
 	{
-		$label = $control->getLabel();
+		$caption = $control->caption;
 
-		if ($label === null) {
+		if (!$caption) {
 			return null;
 		}
 
-		$caption = $label->getText();
-
-		if ($control->isRequired() && $this->asteriskInCaption && is_string($control->caption)) {
+		if ($control->isRequired() && $this->asteriskInCaption && is_string($caption) && $caption) {
 			$caption .= '*';
 		}
 
-		$label->setText($caption);
-
-		return $label;
+		return $control->getLabel($caption);
 	}
 
 	/**
