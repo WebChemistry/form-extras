@@ -16,7 +16,7 @@ use WebChemistry\FormExtras\Theme\Html\HtmlElement;
 class DefaultFormTheme implements FormTheme
 {
 
-	public bool $asteriskInCaption = true;
+	public bool $asteriskInCaption = false;
 
 	public array $form = [
 		'attributes' => [
