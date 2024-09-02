@@ -32,7 +32,7 @@ final class HtmlElement
 
 	public function addFromControlOption(BaseControl $control, string $name): self
 	{
-		$values = $control->getOption($name, []);
+		$values = $control->getOption($name) ?? [];
 		if (!is_array($values)) {
 			throw new LogicException(
 				sprintf('Option "%s" must be an array in form control "%s".', $name, $control->getName())
@@ -49,7 +49,7 @@ final class HtmlElement
 		}
 
 
-		$values = $form->getOption($name, []);
+		$values = $form->getOption($name) ?? [];
 		if (!is_array($values)) {
 			throw new LogicException(
 				sprintf('Option "%s" must be an array in form "%s".', $name, $form->getName())

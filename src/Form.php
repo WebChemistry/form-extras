@@ -129,10 +129,10 @@ class Form extends NetteUIForm implements FormWithOptions
 	/**
 	 * @inheritDoc
 	 */
-	public function setValues($data, bool $erase = false)
+	public function setValues(array|object $values, bool $erase = false, bool $onlyDisabled = false): static
 	{
 		return parent::setValues(
-			is_object($data) ? $this->mapper->mapToArray($this, $data) : $data,
+			is_object($values) ? $this->mapper->mapToArray($this, $values) : $values,
 			$erase
 		);
 	}
@@ -148,7 +148,7 @@ class Form extends NetteUIForm implements FormWithOptions
 	/**
 	 * @inheritDoc
 	 */
-	public function getUntrustedValues($returnType = null, ?array $controls = null)
+	public function getUntrustedValues(string|object|null $returnType = null, ?array $controls = null): object|array
 	{
 		if (method_exists($this, 'getUntrustedValues')) {
 			$array = parent::getUntrustedValues('array', $controls);

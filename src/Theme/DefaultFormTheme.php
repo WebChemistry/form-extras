@@ -123,7 +123,7 @@ class DefaultFormTheme implements FormTheme
 	public function getFormErrors(Form $form): array
 	{
 		if ($form instanceof FormWithOptions) {
-			$own = $form->getOption(self::FormErrors, [])['own'] ?? true;
+			$own = ($form->getOption(self::FormErrors) ?? [])['own'] ?? true;
 
 			if (!$own) {
 				return $form->getErrors();
