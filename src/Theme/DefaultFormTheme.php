@@ -156,8 +156,8 @@ class DefaultFormTheme implements FormTheme
 		$specials = [
 			'.required' => $control->isRequired(),
 			'.optional' => !$control->isRequired(),
-			'.invalid' => $control->hasErrors(),
-			'.valid' => !$control->hasErrors(),
+			'.invalid' => $this->useInvalidClass($control),
+			'.valid' => $this->useValidClass($control),
 		];
 		$this->addSpecialType($specials, $control);
 
@@ -174,8 +174,8 @@ class DefaultFormTheme implements FormTheme
 		$specials = [
 			'.required' => $control->isRequired(),
 			'.optional' => !$control->isRequired(),
-			'.invalid' => $control->hasErrors(),
-			'.valid' => !$control->hasErrors(),
+			'.invalid' => $this->useInvalidClass($control),
+			'.valid' => $this->useValidClass($control),
 		];
 		$this->addSpecialType($specials, $control);
 
@@ -191,8 +191,8 @@ class DefaultFormTheme implements FormTheme
 		$specials = [
 			'.required' => $control->isRequired(),
 			'.optional' => !$control->isRequired(),
-			'.invalid' => $control->hasErrors(),
-			'.valid' => !$control->hasErrors(),
+			'.invalid' => $this->useInvalidClass($control),
+			'.valid' => $this->useValidClass($control),
 		];
 
 		$this->addSpecialType($specials, $control);
@@ -269,6 +269,28 @@ class DefaultFormTheme implements FormTheme
 		if ($type = $control->getOption('type')) {
 			$specials['.' . $type] = true;
 		}
+	}
+
+	private function useValidClass(BaseControl $control): bool
+	{
+		$form = $control->getForm(false);
+
+		if (!$form || !$form->isSubmitted()) {
+			return false;
+		}
+
+		return !$control->hasErrors();
+	}
+
+	private function useInvalidClass(BaseControl $control): bool
+	{
+		$form = $control->getForm(false);
+
+		if (!$form || !$form->isSubmitted()) {
+			return false;
+		}
+
+		return $control->hasErrors();
 	}
 
 }
