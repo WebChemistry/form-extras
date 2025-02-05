@@ -17,6 +17,8 @@ use WebChemistry\FormExtras\Validator\VoidValidatorFactory;
 class Form extends NetteUIForm implements FormWithOptions
 {
 
+	public const PropertyValidationPath = '_propertyValidationPath';
+
 	private FormTheme $theme;
 
 	private MapperInterface $mapper;

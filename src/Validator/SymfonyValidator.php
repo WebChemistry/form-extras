@@ -59,20 +59,35 @@ class SymfonyValidator implements FormValidator
 			return;
 		}
 
+		$index = $this->createControlIndex($form);
+
 		/** @var ConstraintViolation $error */
 		foreach ($errors as $error) {
 			$property = $error->getPropertyPath();
 
-			if (
-				$property &&
-				($component = $form->getComponent($property, false)) &&
-				$component instanceof BaseControl
-			) {
-				$component->addError($error->getMessage());
+			if (isset($index[$property])) {
+				$index[$property]->addError($error->getMessage());
 			} else {
 				$form->addError($error->getMessage());
 			}
 		}
+	}
+
+	/**
+	 * @return BaseControl[]
+	 */
+	private function createControlIndex(Form $form): array
+	{
+		$controls = [];
+
+		/** @var BaseControl $control */
+		foreach ($form->getControls() as $control) {
+			$path = $control->getOption(\WebChemistry\FormExtras\Form::PropertyValidationPath) ?? $control->lookupPath(Form::class);
+
+			$controls[$path] = $control;
+		}
+
+		return $controls;
 	}
 
 }
